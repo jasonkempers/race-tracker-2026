@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/25828972/README.md)
 # 🏁 Jason's 2026 Race Tracker
 
 A personal race planning tool for Ontario gravel cycling and running events — spring & summer 2026.

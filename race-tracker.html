@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason's 2026 Race Tracker</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232638;
+    --border: #2e3248;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --gray: #6b7280;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --bike: #6c63ff;
+    --run: #ff6584;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header-left span { font-size: 13px; color: var(--text2); margin-left: 8px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #5a52d5; }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--border); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #059669; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 32px; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 8px 20px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.15s;
+    color: var(--text2);
+    border: none;
+    background: transparent;
+  }
+  .tab.active { background: var(--surface2); color: var(--text); }
+  .tab.bike.active { color: var(--bike); }
+  .tab.run.active { color: var(--run); }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,0.1); }
+  .filter-spacer { flex: 1; }
+  .search-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    width: 200px;
+  }
+  .search-input:focus { border-color: var(--accent); }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 800; line-height: 1; }
+  .stat-card .label { font-size: 11px; color: var(--text2); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card.doing .num { color: var(--green); }
+  .stat-card.maybe .num { color: var(--yellow); }
+  .stat-card.skip .num { color: var(--gray); }
+  .stat-card.total .num { color: var(--accent); }
+
+  .race-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .race-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+  .race-card:hover { border-color: var(--accent); }
+  .race-card.doing { border-left: 3px solid var(--green); }
+  .race-card.maybe { border-left: 3px solid var(--yellow); }
+  .race-card.skip { border-left: 3px solid var(--gray); opacity: 0.6; }
+  .race-card.interested { border-left: 3px solid var(--blue); }
+
+  .race-date-block {
+    text-align: center;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .race-date-block .month { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text2); letter-spacing: 1px; }
+  .race-date-block .day { font-size: 26px; font-weight: 800; line-height: 1.1; }
+  .race-date-block .weekday { font-size: 10px; color: var(--text2); }
+
+  .race-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .race-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 5px; }
+  .meta-item { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+  .meta-item svg { width: 12px; height: 12px; }
+  .race-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .tag-type-bike { background: rgba(108,99,255,0.15); color: var(--bike); }
+  .tag-type-run { background: rgba(255,101,132,0.15); color: var(--run); }
+  .tag-uci { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .tag-featured { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .tag-charity { background: rgba(16,185,129,0.15); color: var(--green); }
+  .race-notes { font-size: 12px; color: var(--text2); margin-top: 6px; font-style: italic; }
+
+  .race-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; min-width: 160px; }
+  .status-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    width: 100%;
+  }
+  .status-select option { background: var(--surface2); }
+  .action-btns { display: flex; gap: 6px; }
+  .gcal-btn {
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--blue);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .gcal-btn:hover { background: rgba(59,130,246,0.25); }
+  .edit-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .edit-btn:hover { color: var(--text); border-color: var(--accent); }
+  .delete-btn {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: var(--red);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  /* ICS Export */
+  .export-section {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .export-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .export-section p { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+  .export-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text2);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+
+  /* Conflict badge */
+  .conflict-badge {
+    font-size: 10px;
+    background: rgba(239,68,68,0.15);
+    color: var(--red);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .main { padding: 16px; }
+    .race-card { grid-template-columns: 70px 1fr; }
+    .race-actions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .hidden { display: none !important; }
+
+  /* Tooltip */
+  .tooltip-container { position: relative; display: inline-flex; }
+  .tooltip { position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: #1e2235; border: 1px solid var(--border); color: var(--text); font-size: 11px; padding: 6px 10px; border-radius: 6px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 300; }
+  .tooltip-container:hover .tooltip { opacity: 1; }
+
+  .section-header { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin: 24px 0 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>🏁 Jason's 2026 Race Tracker</h1>
+    <span id="subtitle">Ontario · Spring & Summer</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="exportICS('doing')">📅 Export "Doing" to .ics</button>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Race</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <div class="tabs">
+    <button class="tab bike active" onclick="setTab('all')">All Races</button>
+    <button class="tab bike" onclick="setTab('bike')">🚵 Cycling</button>
+    <button class="tab run" onclick="setTab('run')">🏃 Running</button>
+  </div>
+
+  <div class="stats-row" id="stats-row"></div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" onclick="setFilter('interested')">Interested</button>
+    <button class="filter-btn" onclick="setFilter('doing')">✅ Doing</button>
+    <button class="filter-btn" onclick="setFilter('maybe')">🤔 Maybe</button>
+    <button class="filter-btn" onclick="setFilter('skip')">⛔ Skip</button>
+    <div class="filter-spacer"></div>
+    <input class="search-input" type="text" placeholder="Search races..." oninput="handleSearch(this.value)" />
+  </div>
+
+  <div class="race-grid" id="race-grid"></div>
+  <div id="empty-state" class="empty-state hidden">
+    <div class="icon">🔍</div>
+    <h3>No races found</h3>
+    <p>Try adjusting your filters or add a new race.</p>
+  </div>
+
+  <div class="export-section">
+    <h3>📅 Google Calendar & Export</h3>
+    <p>Export your selected races as a calendar file to check for conflicts with existing events. Import the .ics file into Google Calendar (Settings → Import) or Apple Calendar.</p>
+    <div class="export-btns">
+      <button class="btn btn-green" onclick="exportICS('doing')">Export "Doing" races (.ics)</button>
+      <button class="btn btn-ghost" onclick="exportICS('interested')">Export "Interested" races (.ics)</button>
+      <button class="btn btn-ghost" onclick="exportICS('all')">Export all races (.ics)</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <h2 id="modal-title">Add Race</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Race Name *</label>
+        <input class="form-input" type="text" id="f-name" placeholder="e.g. Paris to Ancaster" />
+      </div>
+      <div class="form-group">
+        <label>Type *</label>
+        <select class="form-select" id="f-type">
+          <option value="bike">🚵 Cycling / Gravel</option>
+          <option value="run">🏃 Running</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date *</label>
+        <input class="form-input" type="date" id="f-date" />
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input class="form-input" type="text" id="f-location" placeholder="e.g. Hamilton, ON" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Distances Available</label>
+        <input class="form-input" type="text" id="f-distances" placeholder="e.g. 110km, 60km" />
+      </div>
+      <div class="form-group">
+        <label>My Status</label>
+        <select class="form-select" id="f-status">
+          <option value="interested">Interested</option>
+          <option value="maybe">Maybe</option>
+          <option value="doing">✅ Doing It</option>
+          <option value="skip">⛔ Skip</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>URL / Registration Link</label>
+      <input class="form-input" type="url" id="f-url" placeholder="https://..." />
+    </div>
+    <div class="form-group">
+      <label>Tags (comma separated)</label>
+      <input class="form-input" type="text" id="f-tags" placeholder="e.g. UCI, gravel, charity" />
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea class="form-textarea" id="f-notes" placeholder="Registration deadline, friend is doing it, training goal..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRace()">Save Race</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — Edit this array to add/remove/update races
+// ============================================================
+let races = [
+  // ── CYCLING / GRAVEL ──────────────────────────────────────
+  {
+    id: 1,
+    name: "Paris to Ancaster (P2A)",
+    type: "bike",
+    date: "2026-04-26",
+    location: "Paris → Ancaster, ON",
+    distances: "110km, 60km, 30km",
+    status: "interested",
+    url: "https://www.parisancaster.com",
+    tags: ["gravel", "UCI", "featured"],
+    notes: "Biggest gravel event in Canada. 2,000–3,000 riders. Mix of gravel, road, mud. UCI Gravel World Series."
+  },
+  {
+    id: 2,
+    name: "Scrappy Badger Gravel",
+    type: "bike",
+    date: "2026-05-02",
+    location: "Baltimore, ON",
+    distances: "TBD",
+    status: "interested",
+    url: "",
+    tags: ["gravel"],
+    notes: "Early season gravel race/cyclosportive in Northumberland County."
+  },
+  {
+    id: 3,
+    name: "R3G3 Gravel Cup Canada",
+    type: "bike",
+    date: "2026-05-30",
+    location: "Opeongo Mountains, ON",
+    distances: "TBD",
+    status: "interested",
+    url: "https://gravelcup.com/gravel-cup-events",
+    tags: ["gravel"],
+    notes: "Gravel Cup's flagship event for 2026. Endless forest access roads. Sponsors: Bushtukah, Montu.cc, Specialized."
+  },
+  {
+    id: 4,
+    name: "Screaming Squirrel",
+    type: "bike",
+    date: "2026-06-07",
+    location: "Mono, ON",
+    distances: "85km, 30km",
+    status: "interested",
+    url: "",
+    tags: ["gravel"],
+    notes: "Gravel race in the Headwaters region near Mono. Hilly terrain."
+  },
+  {
+    id: 5,
+    name: "Blue Mountains Gravel Fondo",
+    type: "bike",
+    date: "2026-06-20",
+    location: "Thornbury, ON",
+    distances: "~120km, ~80km",
+    status: "interested",
+    url: "https://thebluemountainsgravelfondo.com",
+    tags: ["gravel", "UCI"],
+    notes: "UCI Gravel World Series qualifier. Top 25% in each age group qualify for UCI Gravel World Championships. ~4,300ft gain on the long course."
+  },
+  {
+    id: 6,
+    name: "Rideau Lakes Cycle Tour",
+    type: "bike",
+    date: "2026-06-20",
+    location: "Ottawa, ON",
+    distances: "210km, 171km, 170km",
+    status: "interested",
+    url: "",
+    tags: ["charity", "gran fondo"],
+    notes: "Iconic multi-day Ottawa ride. Note: same weekend as Blue Mountains Gravel Fondo — conflict!"
+  },
+  {
+    id: 7,
+    name: "Reggie Ramble Gravel Grinder",
+    type: "bike",
+    date: "2026-07-11",
+    location: "Warkworth, ON",
+    distances: "200km, 130km, 65km",
+    status: "interested",
+    url: "",
+    tags: ["gravel"],
+    notes: "Multiple distance options in Northumberland. The 200km is the marquee distance."
+  },
+  // ── RUNNING ───────────────────────────────────────────────
+  {
+    id: 8,
+    name: "Credit Valley Marathon",
+    type: "run",
+    date: "2026-04-26",
+    location: "Mississauga, ON",
+    distances: "Marathon, Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "",
+    tags: ["half marathon"],
+    notes: "5,000–10,000 participants. Note: same day as Paris to Ancaster (cycling conflict)."
+  },
+  {
+    id: 9,
+    name: "Beneva Mississauga Marathon",
+    type: "run",
+    date: "2026-04-26",
+    location: "Mississauga, ON",
+    distances: "Marathon, Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "https://www.mississaugamarathon.com",
+    tags: ["half marathon"],
+    notes: "Flat, fast course. Great half marathon option. Check if same event as Credit Valley — may be combined."
+  },
+  {
+    id: 10,
+    name: "GoodLife Toronto Marathon",
+    type: "run",
+    date: "2026-05-03",
+    location: "Toronto, ON",
+    distances: "Marathon, Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "https://www.torontomarathon.com",
+    tags: ["half marathon", "featured"],
+    notes: "Half: Mel Lastman Square → Ontario Place. Fast, mostly downhill. 10,000+ participants."
+  },
+  {
+    id: 11,
+    name: "Hamilton Road2Hope",
+    type: "run",
+    date: "2026-05-10",
+    location: "Hamilton, ON",
+    distances: "Marathon, Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "",
+    tags: ["half marathon"],
+    notes: "Annual Hamilton marathon weekend. Scenic course. Confirm exact date (Unverified — check runottawa.ca)."
+  },
+  {
+    id: 12,
+    name: "Sporting Life 10K",
+    type: "run",
+    date: "2026-05-10",
+    location: "Toronto, ON",
+    distances: "10K",
+    status: "interested",
+    url: "https://www.sportinglife10k.ca",
+    tags: ["charity"],
+    notes: "10K only — shorter than your 20km target but one of Toronto's most iconic races. Camp Ooch fundraiser."
+  },
+  {
+    id: 13,
+    name: "Tamarack Ottawa Race Weekend",
+    type: "run",
+    date: "2026-05-23",
+    location: "Ottawa, ON",
+    distances: "Marathon, Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "https://www.runottawa.ca",
+    tags: ["half marathon", "featured"],
+    notes: "May 23–24. Half marathon Sunday May 24 at 9am. Ottawa 10K Saturday evening at 6:30pm. Major event — book accommodation early."
+  }
+];
+
+let nextId = Math.max(...races.map(r => r.id)) + 1;
+let currentTab = 'all';
+let currentFilter = 'all';
+let searchQuery = '';
+let editingId = null;
+
+// ============================================================
+// RENDER
+// ============================================================
+function getFilteredRaces() {
+  return races.filter(r => {
+    if (currentTab !== 'all' && r.type !== currentTab) return false;
+    if (currentFilter !== 'all' && r.status !== currentFilter) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return r.name.toLowerCase().includes(q) || r.location.toLowerCase().includes(q) || r.notes.toLowerCase().includes(q);
+    }
+    return true;
+  }).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function renderStats() {
+  const filtered = currentTab === 'all' ? races : races.filter(r => r.type === currentTab);
+  const counts = {
+    total: filtered.length,
+    doing: filtered.filter(r => r.status === 'doing').length,
+    interested: filtered.filter(r => r.status === 'interested').length,
+    maybe: filtered.filter(r => r.status === 'maybe').length,
+    skip: filtered.filter(r => r.status === 'skip').length
+  };
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card total"><div class="num">${counts.total}</div><div class="label">Total Races</div></div>
+    <div class="stat-card doing"><div class="num">${counts.doing}</div><div class="label">Committed</div></div>
+    <div class="stat-card maybe"><div class="num">${counts.interested + counts.maybe}</div><div class="label">Considering</div></div>
+    <div class="stat-card skip"><div class="num">${counts.skip}</div><div class="label">Skipping</div></div>
+  `;
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  return { month: months[d.getMonth()], day: d.getDate(), weekday: days[d.getDay()] };
+}
+
+function statusLabel(s) {
+  return { doing: '✅ Doing It', maybe: '🤔 Maybe', skip: '⛔ Skip', interested: '⭐ Interested' }[s] || s;
+}
+
+function buildGCalLink(race) {
+  const d = race.date.replace(/-/g, '');
+  const nextDay = new Date(race.date + 'T12:00:00');
+  nextDay.setDate(nextDay.getDate() + 1);
+  const nd = nextDay.toISOString().slice(0,10).replace(/-/g,'');
+  const title = encodeURIComponent(race.name + ' 🏁');
+  const loc = encodeURIComponent(race.location);
+  const details = encodeURIComponent(`Distances: ${race.distances}\n${race.notes}\n${race.url}`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${nd}&location=${loc}&details=${details}`;
+}
+
+function renderTagBadge(tag) {
+  const map = { 'UCI': 'tag-uci', 'featured': 'tag-featured', 'charity': 'tag-charity' };
+  const cls = map[tag] || '';
+  if (!cls) return '';
+  return `<span class="tag ${cls}">${tag.toUpperCase()}</span>`;
+}
+
+function renderRace(race) {
+  const dt = formatDate(race.date);
+  const typeClass = race.type === 'bike' ? 'tag-type-bike' : 'tag-type-run';
+  const typeLabel = race.type === 'bike' ? '🚵 Cycling' : '🏃 Running';
+
+  // Detect same-day conflicts among "doing" races
+  const conflicts = races.filter(r => r.id !== race.id && r.date === race.date && (r.status === 'doing' || race.status === 'doing'));
+  const conflictBadge = conflicts.length > 0 ? `<span class="conflict-badge">⚠️ DATE CONFLICT</span>` : '';
+
+  return `
+  <div class="race-card ${race.status}" id="card-${race.id}">
+    <div class="race-date-block">
+      <div class="month">${dt.month}</div>
+      <div class="day">${dt.day}</div>
+      <div class="weekday">${dt.weekday}</div>
+    </div>
+    <div class="race-info">
+      <h3>${race.name} ${conflictBadge}</h3>
+      <div class="race-meta">
+        <span class="meta-item">📍 ${race.location}</span>
+        <span class="meta-item">📏 ${race.distances}</span>
+      </div>
+      <div class="race-tags">
+        <span class="tag ${typeClass}">${typeLabel}</span>
+        ${race.tags.map(renderTagBadge).join('')}
+      </div>
+      ${race.notes ? `<div class="race-notes">${race.notes}</div>` : ''}
+    </div>
+    <div class="race-actions">
+      <select class="status-select" onchange="updateStatus(${race.id}, this.value)">
+        <option value="interested" ${race.status==='interested'?'selected':''}>⭐ Interested</option>
+        <option value="doing" ${race.status==='doing'?'selected':''}>✅ Doing It</option>
+        <option value="maybe" ${race.status==='maybe'?'selected':''}>🤔 Maybe</option>
+        <option value="skip" ${race.status==='skip'?'selected':''}>⛔ Skip</option>
+      </select>
+      <div class="action-btns">
+        <a class="gcal-btn" href="${buildGCalLink(race)}" target="_blank">📅 + GCal</a>
+        <button class="edit-btn" onclick="openEditModal(${race.id})">✏️</button>
+        <button class="delete-btn" onclick="deleteRace(${race.id})">🗑</button>
+      </div>
+      ${race.url ? `<a href="${race.url}" target="_blank" style="font-size:11px;color:var(--blue);text-decoration:none;">🔗 Race website</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function render() {
+  renderStats();
+  const filtered = getFilteredRaces();
+  const grid = document.getElementById('race-grid');
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  // Group by month
+  const byMonth = {};
+  filtered.forEach(r => {
+    const key = r.date.slice(0, 7); // YYYY-MM
+    if (!byMonth[key]) byMonth[key] = [];
+    byMonth[key].push(r);
+  });
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let html = '';
+  Object.keys(byMonth).sort().forEach(key => {
+    const [y, m] = key.split('-');
+    html += `<div class="section-header">${monthNames[parseInt(m)-1]} ${y}</div>`;
+    byMonth[key].forEach(r => { html += renderRace(r); });
+  });
+  grid.innerHTML = html;
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['all','bike','run'][i] === tab);
+  });
+  render();
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(f) || (f === 'all' && b.textContent === 'All'));
+  });
+  render();
+}
+
+function handleSearch(q) {
+  searchQuery = q;
+  render();
+}
+
+function updateStatus(id, status) {
+  const race = races.find(r => r.id === id);
+  if (race) { race.status = status; render(); }
+}
+
+function deleteRace(id) {
+  if (confirm('Delete this race?')) {
+    races = races.filter(r => r.id !== id);
+    render();
+  }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add Race';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-type').value = 'bike';
+  document.getElementById('f-date').value = '';
+  document.getElementById('f-location').value = '';
+  document.getElementById('f-distances').value = '';
+  document.getElementById('f-status').value = 'interested';
+  document.getElementById('f-url').value = '';
+  document.getElementById('f-tags').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function openEditModal(id) {
+  editingId = id;
+  const r = races.find(race => race.id === id);
+  if (!r) return;
+  document.getElementById('modal-title').textContent = 'Edit Race';
+  document.getElementById('f-name').value = r.name;
+  document.getElementById('f-type').value = r.type;
+  document.getElementById('f-date').value = r.date;
+  document.getElementById('f-location').value = r.location;
+  document.getElementById('f-distances').value = r.distances;
+  document.getElementById('f-status').value = r.status;
+  document.getElementById('f-url').value = r.url || '';
+  document.getElementById('f-tags').value = r.tags.join(', ');
+  document.getElementById('f-notes').value = r.notes || '';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  editingId = null;
+}
+
+function saveRace() {
+  const name = document.getElementById('f-name').value.trim();
+  const date = document.getElementById('f-date').value;
+  if (!name || !date) { alert('Race name and date are required.'); return; }
+
+  const data = {
+    name,
+    type: document.getElementById('f-type').value,
+    date,
+    location: document.getElementById('f-location').value.trim() || 'Ontario, Canada',
+    distances: document.getElementById('f-distances').value.trim() || 'TBD',
+    status: document.getElementById('f-status').value,
+    url: document.getElementById('f-url').value.trim(),
+    tags: document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    notes: document.getElementById('f-notes').value.trim()
+  };
+
+  if (editingId !== null) {
+    const idx = races.findIndex(r => r.id === editingId);
+    if (idx !== -1) { races[idx] = { ...races[idx], ...data }; }
+  } else {
+    races.push({ id: nextId++, ...data });
+  }
+
+  closeModal();
+  render();
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ============================================================
+// ICS EXPORT
+// ============================================================
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function toICSDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+}
+
+function escapeICS(str) {
+  return (str || '').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+}
+
+function exportICS(filterStatus) {
+  let toExport;
+  if (filterStatus === 'all') {
+    toExport = races;
+  } else {
+    toExport = races.filter(r => r.status === filterStatus);
+  }
+
+  if (toExport.length === 0) {
+    alert(`No races with status "${filterStatus}" to export.`);
+    return;
+  }
+
+  const uid_base = Date.now();
+  let cal = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Jason Race Tracker 2026//EN',
+    'CALSCALE:GREGORIAN',
+    'X-WR-CALNAME:2026 Race Calendar',
+    'X-WR-TIMEZONE:America/Toronto'
+  ].join('\r\n');
+
+  toExport.forEach((r, i) => {
+    const start = toICSDate(r.date);
+    const d = new Date(r.date + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    const end = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+    const desc = escapeICS(`Distances: ${r.distances}\\n${r.notes}\\nStatus: ${r.status}${r.url ? '\\n' + r.url : ''}`);
+
+    cal += '\r\nBEGIN:VEVENT\r\n' +
+      `UID:race-${r.id}-${uid_base+i}@jason-race-tracker\r\n` +
+      `DTSTART;VALUE=DATE:${start}\r\n` +
+      `DTEND;VALUE=DATE:${end}\r\n` +
+      `SUMMARY:🏁 ${escapeICS(r.name)}\r\n` +
+      `LOCATION:${escapeICS(r.location)}\r\n` +
+      `DESCRIPTION:${desc}\r\n` +
+      `CATEGORIES:${r.type === 'bike' ? 'CYCLING' : 'RUNNING'}\r\n` +
+      'END:VEVENT';
+  });
+
+  cal += '\r\nEND:VCALENDAR';
+
+  const blob = new Blob([cal], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `jason-races-2026-${filterStatus}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+render();
+</script>
+</body>
+</html>
