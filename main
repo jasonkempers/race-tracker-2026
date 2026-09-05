@@ -574,15 +574,15 @@ let races = [
   },
   {
     id: 11,
-    name: "Hamilton Road2Hope",
+    name: "Hamilton Marathon Road2Hope",
     type: "run",
-    date: "2026-05-10",
+    date: "2026-11-01",
     location: "Hamilton, ON",
     distances: "Marathon, Half (21.1km), 10K, 5K",
     status: "interested",
-    url: "",
+    url: "https://www.hamiltonmarathon.ca/the-races",
     tags: ["half marathon"],
-    notes: "Annual Hamilton marathon weekend. Scenic course. Confirm exact date (Unverified — check runottawa.ca)."
+    notes: "DATE CORRECTED — this is a fall race, not May. Race weekend Oct 31–Nov 1, 2026; half starts 8:00am Sunday Nov 1 at Confederation Park. Flat, fast single-loop waterfront course with a net drop — long-standing PB/BQ race. Registration open as of Sep 2026."
   },
   {
     id: 12,
@@ -607,6 +607,67 @@ let races = [
     url: "https://www.runottawa.ca",
     tags: ["half marathon", "featured"],
     notes: "May 23–24. Half marathon Sunday May 24 at 9am. Ottawa 10K Saturday evening at 6:30pm. Major event — book accommodation early."
+  },
+  // ── FALL 2026 RUNNING ─────────────────────────────────────
+  {
+    id: 14,
+    name: "Oakville 21.1",
+    type: "run",
+    date: "2026-10-04",
+    location: "Oakville, ON",
+    distances: "Half (21.1km), 10K, 5K",
+    status: "interested",
+    url: "https://raceroster.com/events/2026/111687/oakville-211",
+    tags: ["half marathon", "featured"],
+    notes: "Best match for the 20km target — 21.1km is the closest real distance on offer. Flat Lakeshore Rd W course, start/finish at Shell Park. Half off at 7:30am, 3.5h cutoff. ~30 min from Mississauga, no travel or hotel needed."
+  },
+  {
+    id: 15,
+    name: "The County Marathon",
+    type: "run",
+    date: "2026-10-04",
+    location: "Picton, ON (Prince Edward County)",
+    distances: "Marathon, Half (21.1km), Marathon Relay, 5K",
+    status: "interested",
+    url: "https://countymarathon.ca/half-marathon/",
+    tags: ["half marathon"],
+    notes: "23rd annual. Half starts 10:00am; shuttles from Picton fairgrounds from 8:00am. Athletics Canada certified course (Boston qualifier). $105. Same day as Oakville 21.1 — pick one. ~2.5h drive; works as a County weekend."
+  },
+  {
+    id: 16,
+    name: "TCS Toronto Waterfront Marathon",
+    type: "run",
+    date: "2026-10-18",
+    location: "Toronto, ON",
+    distances: "Marathon, Half (21.1km), 5K (Sat Oct 17)",
+    status: "maybe",
+    url: "https://www.torontowaterfrontmarathon.com/event-info/",
+    tags: ["half marathon", "featured"],
+    notes: "SOLD OUT as of Sep 2026. Entry now only via Race Roster bib transfer (allowed up to 3 days before race day, same distance) or an official charity team. Half was $150. Canada's largest race, flat and fast. Marked maybe — depends on landing a transfer."
+  },
+  {
+    id: 17,
+    name: "Fanshawe 25K / 50K Trail Race",
+    type: "run",
+    date: "2026-10-17",
+    location: "London, ON",
+    distances: "50K, 25K",
+    status: "interested",
+    url: "https://www.backcountryrunner.com/trail-races/vulture-bait/",
+    tags: ["trail"],
+    notes: "Loops around Fanshawe Conservation Area — successor to the long-running Vulture Bait Trail Race, listed as new for 2026 under Phoenix Trail Races. Unverified: confirm 2026 branding, date and registration directly with the organiser. 25K on trail is a comparable effort to a 20K road race."
+  },
+  {
+    id: 18,
+    name: "Niagara Falls 10K, Half & Marathon",
+    type: "run",
+    date: "2026-10-25",
+    location: "Niagara Falls, ON",
+    distances: "Marathon, Half (21.1km), 10K",
+    status: "skip",
+    url: "https://niagarafallsmarathon.com/half-event.html",
+    tags: ["half marathon"],
+    notes: "SOLD OUT for 2026. Fallsview Blvd start, out along the Niagara Parkway past Horseshoe Falls, finish at the Convention Centre; entirely Canadian route this year. Marked skip on availability, not appeal — put it on the 2027 list."
   }
 ];
 
