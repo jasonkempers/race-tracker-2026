@@ -1,6 +1,6 @@
 # 🏁 Jason's 2026 Race Tracker
 
-A personal race planning tool for Ontario gravel cycling and running events — spring & summer 2026.
+A personal race planning tool for Ontario gravel cycling and running events across the 2026 season — spring through late fall.
 
 **Live:** https://jasonkempers.github.io/race-tracker-2026/race-tracker.html
 
@@ -8,7 +8,7 @@ A personal race planning tool for Ontario gravel cycling and running events — 
 
 ## What it does
 
-- Tracks 13 pre-loaded Ontario races (7 cycling/gravel, 6 running)
+- Tracks 18 pre-loaded Ontario races (7 cycling/gravel, 11 running)
 - Mark each race as **Interested / Doing / Maybe / Skip**
 - One-click **Add to Google Calendar** per race
 - Export your "Doing" races as a `.ics` file to import into any calendar
@@ -38,9 +38,16 @@ A personal race planning tool for Ontario gravel cycling and running events — 
 | Credit Valley Trail Marathon | Apr 26 | 42km, 21km |
 | Beneva Mississauga Marathon | Apr 26 | 42km, 21km |
 | GoodLife Toronto Marathon | May 3 | 42km, 21km |
-| Hamilton Road2Hope | May 10 | 21km |
 | Sporting Life 10K | May 10 | 10km |
 | Tamarack Ottawa Race Weekend | May 23–24 | 42km, 21km, 10km |
+| Oakville 21.1 | Oct 4 | 21.1km, 10km, 5km |
+| The County Marathon (Picton) | Oct 4 | 42km, 21.1km, 5km |
+| Fanshawe Trail Race (London) | Oct 17 | 50km, 25km |
+| TCS Toronto Waterfront Marathon | Oct 18 | 42km, 21.1km, 5km |
+| Niagara Falls 10K, Half & Marathon | Oct 25 | 42km, 21.1km, 10km |
+| Hamilton Marathon Road2Hope | Nov 1 | 42km, 21.1km, 10km, 5km |
+
+> **Availability note (as of Sep 2026):** Toronto Waterfront and Niagara Falls are sold out for 2026 — Toronto is bib-transfer or charity entry only. Oakville, The County and Road2Hope were open.
 
 ---
 
