@@ -8,7 +8,7 @@ A personal race planning tool for Ontario gravel cycling and running events acro
 
 ## What it does
 
-- Tracks 18 pre-loaded Ontario races (7 cycling/gravel, 11 running)
+- Tracks 19 pre-loaded Ontario races (7 cycling/gravel, 12 running)
 - Mark each race as **Interested / Doing / Maybe / Skip**
 - One-click **Add to Google Calendar** per race
 - Export your "Doing" races as a `.ics` file to import into any calendar
@@ -46,8 +46,9 @@ A personal race planning tool for Ontario gravel cycling and running events acro
 | TCS Toronto Waterfront Marathon | Oct 18 | 42km, 21.1km, 5km |
 | Niagara Falls 10K, Half & Marathon | Oct 25 | 42km, 21.1km, 10km |
 | Hamilton Marathon Road2Hope | Nov 1 | 42km, 21.1km, 10km, 5km |
+| Boxing Day 10 Miler (Hamilton) | Dec 26 | 16.1km, 6.4km |
 
-> **Availability note (as of Sep 2026):** Toronto Waterfront and Niagara Falls are sold out for 2026 — Toronto is bib-transfer or charity entry only. Oakville, The County and Road2Hope were open.
+> **Availability note (as of Oct 6, 2026):** every fall half marathon in range has sold out — Toronto Waterfront (transfer/charity only), Niagara Falls, and now Road2Hope's half. Road2Hope's 5K/10K/marathon stay open until ~Oct 27. The Boxing Day 10 Miler takes same-day registration and cannot sell out.
 
 ---
 
